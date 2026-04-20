@@ -6,140 +6,110 @@
 <title>WedOS — The Wedding Operating System</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #08090C;
-    --surface: #0F1117;
-    --border: rgba(255,255,255,0.07);
-    --gold: #C9A84C;
-    --gold-dim: rgba(201,168,76,0.15);
-    --gold-glow: rgba(201,168,76,0.35);
-    --rose: #C8706A;
-    --rose-dim: rgba(200,112,106,0.15);
-    --text: #EDEAE4;
-    --text-dim: #7A7870;
-    --text-dimmer: #3A3835;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
-
-  /* NAV */
-  nav { position: fixed; top: 0; width: 100%; z-index: 100; padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--gold); letter-spacing: 0.04em; }
-  .nav-links { display: flex; gap: 32px; }
-  .nav-links a { font-size: 13px; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
-  .nav-links a:hover { color: var(--text); }
-  .nav-cta { background: var(--gold); color: #0F0C05; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 9px 20px; border-radius: 6px; border: none; cursor: pointer; letter-spacing: 0.02em; }
-
-  /* HERO */
-  .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 40px 80px; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 700px; height: 700px; background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%); pointer-events: none; }
-  .hero::after { content: ''; position: absolute; bottom: -100px; right: -100px; width: 500px; height: 500px; background: radial-gradient(ellipse, rgba(200,112,106,0.04) 0%, transparent 70%); pointer-events: none; }
-
-  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.25); border-radius: 20px; padding: 5px 14px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 32px; }
-  .badge-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 8vw, 100px); font-weight: 300; line-height: 1.0; color: var(--text); margin-bottom: 12px; letter-spacing: -0.01em; }
-  .hero-title em { font-style: italic; color: var(--gold); }
-  .hero-title .line2 { font-weight: 600; }
-
-  .hero-sub { font-size: 17px; color: var(--text-dim); max-width: 520px; line-height: 1.7; margin: 0 auto 48px; font-weight: 300; }
-
-  .hero-input-wrap { display: flex; gap: 0; max-width: 440px; width: 100%; margin: 0 auto 24px; }
-  .hero-input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-right: none; border-radius: 8px 0 0 8px; padding: 13px 18px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); outline: none; }
-  .hero-input::placeholder { color: var(--text-dim); }
-  .hero-input:focus { border-color: rgba(201,168,76,0.4); }
-  .hero-submit { background: var(--gold); color: #0F0C05; border: none; border-radius: 0 8px 8px 0; padding: 13px 24px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-
-  .hero-note { font-size: 11px; color: var(--text-dimmer); }
-  .hero-note span { color: var(--gold); }
-
-  .hero-stats { display: flex; gap: 48px; margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--border); }
-  .hero-stat-val { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; color: var(--text); line-height: 1; }
-  .hero-stat-label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
-
-  /* SECTION */
-  section { padding: 100px 60px; max-width: 1100px; margin: 0 auto; }
-
-  .section-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
-  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 5vw, 58px); font-weight: 400; line-height: 1.1; color: var(--text); margin-bottom: 16px; }
-  .section-title em { font-style: italic; font-weight: 300; }
-  .section-sub { font-size: 16px; color: var(--text-dim); max-width: 540px; line-height: 1.7; font-weight: 300; }
-
-  /* PROBLEM SECTION */
-  .problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
-  .problem-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
-  .problem-num { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--text-dimmer); line-height: 1; margin-bottom: 12px; }
-  .problem-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
-  .problem-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
-
-  /* FEATURES */
-  .features-wrap { margin-top: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; transition: border-color 0.2s; }
-  .feature-card:hover { border-color: rgba(201,168,76,0.25); }
-  .feature-card.wide { grid-column: span 2; }
-  .feature-icon { font-size: 28px; margin-bottom: 14px; }
-  .feature-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-  .feature-text { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
-  .feature-tag { display: inline-block; font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; background: var(--gold-dim); color: var(--gold); border-radius: 3px; padding: 2px 8px; margin-top: 12px; }
-
-  /* FOR WHO */
-  .for-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 56px; }
-  .for-card { border-radius: 16px; padding: 40px; }
-  .for-card.couples { background: linear-gradient(135deg, rgba(200,112,106,0.08) 0%, rgba(200,112,106,0.02) 100%); border: 1px solid rgba(200,112,106,0.2); }
-  .for-card.vendors { background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(201,168,76,0.02) 100%); border: 1px solid rgba(201,168,76,0.2); }
-  .for-who { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; }
-  .for-card.couples .for-who { color: var(--rose); }
-  .for-card.vendors .for-who { color: var(--gold); }
-  .for-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: var(--text); margin-bottom: 20px; }
-  .for-points { display: flex; flex-direction: column; gap: 10px; }
-  .for-point { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-dim); line-height: 1.5; }
-  .for-check { flex-shrink: 0; font-size: 13px; }
-
-  /* CTA */
-  .cta-section { text-align: center; padding: 100px 40px; border-top: 1px solid var(--border); }
-  .cta-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 300; line-height: 1.1; margin-bottom: 20px; }
-  .cta-title em { font-style: italic; color: var(--gold); }
-  .cta-sub { font-size: 15px; color: var(--text-dim); margin-bottom: 40px; font-weight: 300; }
-  .cta-btns { display: flex; gap: 14px; justify-content: center; }
-  .cta-btn-primary { background: var(--gold); color: #0F0C05; border: none; border-radius: 8px; padding: 14px 32px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
-  .cta-btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid var(--border); border-radius: 8px; padding: 14px 32px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; }
-
-  /* FOOTER */
-  footer { border-top: 1px solid var(--border); padding: 32px 60px; display: flex; justify-content: space-between; align-items: center; }
-  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold); }
-  .footer-copy { font-size: 11px; color: var(--text-dimmer); }
+  :root { --bg:#08090C;--surface:#0F1117;--border:rgba(255,255,255,0.07);--gold:#C9A84C;--gold-dim:rgba(201,168,76,0.15);--rose:#C8706A;--rose-dim:rgba(200,112,106,0.15);--text:#EDEAE4;--text-dim:#7A7870;--text-dimmer:#3A3835; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+  nav{position:fixed;top:0;width:100%;z-index:100;padding:18px 60px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.04);}
+  .nav-logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold);letter-spacing:0.04em;cursor:pointer;}
+  .nav-links{display:flex;gap:32px;}
+  .nav-links a{font-size:13px;color:var(--text-dim);text-decoration:none;transition:color 0.2s;cursor:pointer;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-right{display:flex;gap:10px;align-items:center;}
+  .nav-login{background:transparent;color:var(--text-dim);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 18px;border-radius:6px;cursor:pointer;transition:all 0.2s;}
+  .nav-login:hover{border-color:rgba(255,255,255,0.2);color:var(--text);}
+  .nav-cta{background:var(--gold);color:#0F0C05;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 20px;border-radius:6px;border:none;cursor:pointer;}
+  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(ellipse,rgba(201,168,76,0.06) 0%,transparent 70%);pointer-events:none;}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);border-radius:20px;padding:5px 14px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:32px;}
+  .badge-dot{width:5px;height:5px;background:var(--gold);border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(52px,8vw,100px);font-weight:300;line-height:1.0;color:var(--text);margin-bottom:12px;}
+  .hero-title em{font-style:italic;color:var(--gold);}
+  .hero-title .line2{font-weight:600;}
+  .hero-sub{font-size:17px;color:var(--text-dim);max-width:520px;line-height:1.7;margin:0 auto 48px;font-weight:300;}
+  .hero-input-wrap{display:flex;max-width:440px;width:100%;margin:0 auto 24px;}
+  .hero-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-right:none;border-radius:8px 0 0 8px;padding:13px 18px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;}
+  .hero-input::placeholder{color:var(--text-dim);}
+  .hero-input:focus{border-color:rgba(201,168,76,0.4);}
+  .hero-submit{background:var(--gold);color:#0F0C05;border:none;border-radius:0 8px 8px 0;padding:13px 24px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .hero-note{font-size:11px;color:var(--text-dimmer);}
+  .hero-note span{color:var(--gold);}
+  .hero-stats{display:flex;gap:48px;margin-top:64px;padding-top:48px;border-top:1px solid var(--border);}
+  .hero-stat-val{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:var(--text);line-height:1;}
+  .hero-stat-label{font-size:12px;color:var(--text-dim);margin-top:4px;}
+  section{padding:100px 60px;max-width:1100px;margin:0 auto;}
+  .section-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,58px);font-weight:400;line-height:1.1;color:var(--text);margin-bottom:16px;}
+  .section-title em{font-style:italic;font-weight:300;}
+  .section-sub{font-size:16px;color:var(--text-dim);max-width:540px;line-height:1.7;font-weight:300;}
+  .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px;}
+  .problem-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;}
+  .problem-num{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--text-dimmer);line-height:1;margin-bottom:12px;}
+  .problem-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px;}
+  .problem-text{font-size:13px;color:var(--text-dim);line-height:1.6;}
+  .features-wrap{margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .feature-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 32px;transition:border-color 0.2s;}
+  .feature-card:hover{border-color:rgba(201,168,76,0.25);}
+  .feature-card.wide{grid-column:span 2;}
+  .feature-icon{font-size:28px;margin-bottom:14px;}
+  .feature-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-bottom:8px;}
+  .feature-text{font-size:13px;color:var(--text-dim);line-height:1.7;}
+  .feature-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;background:var(--gold-dim);color:var(--gold);border-radius:3px;padding:2px 8px;margin-top:12px;}
+  .for-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:56px;}
+  .for-card{border-radius:16px;padding:40px;cursor:pointer;transition:transform 0.2s;}
+  .for-card:hover{transform:translateY(-3px);}
+  .for-card.couples{background:linear-gradient(135deg,rgba(200,112,106,0.08) 0%,rgba(200,112,106,0.02) 100%);border:1px solid rgba(200,112,106,0.2);}
+  .for-card.vendors{background:linear-gradient(135deg,rgba(201,168,76,0.08) 0%,rgba(201,168,76,0.02) 100%);border:1px solid rgba(201,168,76,0.2);}
+  .for-who{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;}
+  .for-card.couples .for-who{color:var(--rose);}
+  .for-card.vendors .for-who{color:var(--gold);}
+  .for-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--text);margin-bottom:20px;}
+  .for-points{display:flex;flex-direction:column;gap:10px;}
+  .for-point{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text-dim);line-height:1.5;}
+  .for-cta{margin-top:20px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;}
+  .for-card.couples .for-cta{color:var(--rose);}
+  .for-card.vendors .for-cta{color:var(--gold);}
+  .cta-section{text-align:center;padding:100px 40px;border-top:1px solid var(--border);}
+  .cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,6vw,72px);font-weight:300;line-height:1.1;margin-bottom:20px;}
+  .cta-title em{font-style:italic;color:var(--gold);}
+  .cta-sub{font-size:15px;color:var(--text-dim);margin-bottom:40px;font-weight:300;}
+  .cta-btns{display:flex;gap:14px;justify-content:center;}
+  .cta-btn-primary{background:var(--gold);color:#0F0C05;border:none;border-radius:8px;padding:14px 32px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;}
+  .cta-btn-secondary{background:transparent;color:var(--text-dim);border:1px solid var(--border);border-radius:8px;padding:14px 32px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all 0.2s;}
+  .cta-btn-secondary:hover{border-color:rgba(255,255,255,0.2);color:var(--text);}
+  footer{border-top:1px solid var(--border);padding:32px 60px;display:flex;justify-content:space-between;align-items:center;}
+  .footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);}
+  .footer-links{display:flex;gap:24px;}
+  .footer-links a{font-size:11px;color:var(--text-dimmer);text-decoration:none;cursor:pointer;}
+  .footer-links a:hover{color:var(--text-dim);}
+  .footer-copy{font-size:11px;color:var(--text-dimmer);}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <div class="nav-logo">WedOS</div>
+  <div class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">WedOS</div>
   <div class="nav-links">
-    <a href="#">For Couples</a>
-    <a href="#">For Vendors</a>
-    <a href="#">Pricing</a>
-    <a href="#">About</a>
+    <a onclick="document.getElementById('sec-couples').scrollIntoView({behavior:'smooth'})">For Couples</a>
+    <a onclick="document.getElementById('sec-vendors').scrollIntoView({behavior:'smooth'})">For Vendors</a>
+    <a onclick="document.getElementById('sec-cta').scrollIntoView({behavior:'smooth'})">Pricing</a>
+    <a onclick="showAbout()">About</a>
   </div>
-  <button class="nav-cta" onclick="window.location.href='signup.html'">Join Waitlist</button>
+  <div class="nav-right">
+    <button class="nav-login" onclick="window.location.href='login.html'">Sign In</button>
+    <button class="nav-cta" onclick="window.location.href='signup.html'">Join Waitlist</button>
+  </div>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <div class="hero-badge"><div class="badge-dot"></div>Now accepting founding vendors</div>
-  <h1 class="hero-title">
-    The <em>operating system</em><br>
-    <span class="line2">for your wedding.</span>
-  </h1>
+  <h1 class="hero-title">The <em>operating system</em><br><span class="line2">for your wedding.</span></h1>
   <p class="hero-sub">Every vendor. Every detail. Every moment — coordinated in real time. WedOS connects couples and vendors inside one intelligent platform so nothing falls through the cracks.</p>
-
   <div class="hero-input-wrap">
-    <input class="hero-input" type="email" placeholder="Enter your email address">
-    <button class="hero-submit" onclick="window.location.href='signup.html'">Join Waitlist →</button>
+    <input class="hero-input" type="email" id="heroEmail" placeholder="Enter your email address">
+    <button class="hero-submit" onclick="heroJoin()">Join Waitlist →</button>
   </div>
   <div class="hero-note">Free for couples. <span>Founding vendor pricing available now.</span></div>
-
   <div class="hero-stats">
     <div><div class="hero-stat-val">$70B+</div><div class="hero-stat-label">Wedding industry annually</div></div>
     <div><div class="hero-stat-val">18+</div><div class="hero-stat-label">Vendors per wedding</div></div>
@@ -147,112 +117,84 @@
   </div>
 </div>
 
-<!-- PROBLEM -->
 <section>
   <div class="section-label">The Problem</div>
   <h2 class="section-title">A $70 billion industry<br><em>running on group texts.</em></h2>
   <p class="section-sub">Couples manage 18+ vendors with no unified system. Vendors operate in isolation. The wedding day runs on hope. Until now.</p>
-
   <div class="problem-grid">
-    <div class="problem-card">
-      <div class="problem-num">01</div>
-      <div class="problem-title">Couples are accidental project managers</div>
-      <div class="problem-text">Juggling 18 vendors across email, text, and spreadsheets with no training and everything to lose.</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-num">02</div>
-      <div class="problem-title">Vendors operate in the dark</div>
-      <div class="problem-text">Caterers don't know when florists arrive. DJs don't know when the ceremony ends. Nobody has the full picture.</div>
-    </div>
-    <div class="problem-card">
-      <div class="problem-num">03</div>
-      <div class="problem-title">The day itself has no system</div>
-      <div class="problem-text">A 12-minute ceremony delay cascades into catering, music, and photography chaos. There's no tool to manage it in real time.</div>
-    </div>
+    <div class="problem-card"><div class="problem-num">01</div><div class="problem-title">Couples are accidental project managers</div><div class="problem-text">Juggling 18 vendors across email, text, and spreadsheets with no training and everything to lose.</div></div>
+    <div class="problem-card"><div class="problem-num">02</div><div class="problem-title">Vendors operate in the dark</div><div class="problem-text">Caterers don't know when florists arrive. DJs don't know when the ceremony ends. Nobody has the full picture.</div></div>
+    <div class="problem-card"><div class="problem-num">03</div><div class="problem-title">The day itself has no system</div><div class="problem-text">A 12-minute ceremony delay cascades into catering, music, and photography chaos. There's no tool to manage it in real time.</div></div>
   </div>
 </section>
 
-<!-- FEATURES -->
 <section style="border-top:1px solid var(--border)">
   <div class="section-label">The Solution</div>
   <h2 class="section-title"><em>One platform.</em><br>Every stakeholder.</h2>
   <p class="section-sub">WedOS is purpose-built infrastructure for the whole wedding — from the first vendor booked to the last dance.</p>
-
   <div class="features-wrap">
-    <div class="feature-card">
-      <div class="feature-icon">🧠</div>
-      <div class="feature-title">AI Wedding Planner</div>
-      <div class="feature-text">Learns your style, budget, and priorities. Surfaces conflicts before they become problems. Remembers every decision so nothing is ever lost.</div>
-      <div class="feature-tag">For Couples</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🤝</div>
-      <div class="feature-title">Vendor Hub</div>
-      <div class="feature-text">Contracts, payments, messaging, and timelines — all in one place. Leads arrive with full couple profiles pre-built.</div>
-<nav>
-    <div class="nav-logo">WedOS</div>
-    <div class="nav-links">
-        <a href="wedos-couple-dashboard%20(1).html">For Couples</a>
-        <a href="wedos-vendor-portal%20(1).html">For Vendors</a>
-        <a href="login.html">Login</a>
-        <a href="signup.html">About</a>
-    </div>
-    <button class="nav-cta" onclick="location.href='signup.html'">Join Waitlist</button>
-</nav>    </div>
-    <div class="feature-card wide">
-      <div class="feature-icon">🎯</div>
-      <div class="feature-title">Live Wedding Day Command Center</div>
-      <div class="feature-text">On the day, WedOS activates real-time coordination for every vendor. Ceremony runs 15 minutes late? The platform auto-cascades to catering, the DJ, the photographer, and transportation — instantly. Air traffic control for the most important day of your life.</div>
-      <div class="feature-tag">The Breakthrough Feature</div>
-    </div>
+    <div class="feature-card"><div class="feature-icon">🧠</div><div class="feature-title">AI Wedding Planner</div><div class="feature-text">Learns your style, budget, and priorities. Surfaces conflicts before they become problems.</div><div class="feature-tag">For Couples</div></div>
+    <div class="feature-card"><div class="feature-icon">🤝</div><div class="feature-title">Vendor Hub</div><div class="feature-text">Contracts, payments, messaging, and timelines — all in one place. Leads arrive with full couple profiles pre-built.</div><div class="feature-tag">For Vendors</div></div>
+    <div class="feature-card wide"><div class="feature-icon">🎯</div><div class="feature-title">Live Wedding Day Command Center</div><div class="feature-text">On the day, WedOS activates real-time coordination for every vendor. Ceremony runs 15 minutes late? The platform auto-cascades to catering, the DJ, the photographer, and transportation — instantly.</div><div class="feature-tag">The Breakthrough Feature</div></div>
   </div>
 </section>
 
-<!-- FOR WHO -->
-<section style="border-top:1px solid var(--border)">
+<section style="border-top:1px solid var(--border)" id="sec-couples">
   <div class="section-label">Who It's For</div>
   <h2 class="section-title">Built for <em>both sides</em><br>of every wedding.</h2>
-
-  <div class="for-grid">
-    <div class="for-card couples">
+  <div class="for-grid" id="sec-vendors">
+    <div class="for-card couples" onclick="window.location.href='signup.html'">
       <div class="for-who">For Couples</div>
       <div class="for-title">Plan with confidence, not chaos.</div>
       <div class="for-points">
-        <div class="for-point"><span class="for-check">🌸</span>One dashboard for every vendor, contract, and payment</div>
-        <div class="for-point"><span class="for-check">🌸</span>AI planner that flags issues before you even notice them</div>
-        <div class="for-point"><span class="for-check">🌸</span>Guest management, RSVPs, and seating all in one place</div>
-        <div class="for-point"><span class="for-check">🌸</span>Live day-of view so you can actually enjoy your wedding</div>
-        <div class="for-point"><span class="for-check">🌸</span><strong>Always free for couples</strong></div>
+        <div class="for-point"><span>🌸</span>One dashboard for every vendor, contract, and payment</div>
+        <div class="for-point"><span>🌸</span>AI planner that flags issues before you even notice them</div>
+        <div class="for-point"><span>🌸</span>Guest management, RSVPs, and seating all in one place</div>
+        <div class="for-point"><span>🌸</span>Live day-of view so you can actually enjoy your wedding</div>
+        <div class="for-point"><span>🌸</span><strong>Always free for couples</strong></div>
       </div>
+      <div class="for-cta">Get started free →</div>
     </div>
-    <div class="for-card vendors">
+    <div class="for-card vendors" onclick="window.location.href='signup.html'">
       <div class="for-who">For Vendors</div>
       <div class="for-title">Run a more professional business.</div>
       <div class="for-points">
-        <div class="for-point"><span class="for-check">✦</span>Leads arrive with full couple profiles — no cold discovery</div>
-        <div class="for-point"><span class="for-check">✦</span>Built-in contracts, e-signatures, and invoicing</div>
-        <div class="for-point"><span class="for-check">✦</span>Your timeline, your tasks, your cues — all in one portal</div>
-        <div class="for-point"><span class="for-check">✦</span>Reviews tied to real bookings build your reputation</div>
-        <div class="for-point"><span class="for-check">✦</span><strong>Founding vendor pricing: from $50/month</strong></div>
+        <div class="for-point"><span>✦</span>Leads arrive with full couple profiles — no cold discovery</div>
+        <div class="for-point"><span>✦</span>Built-in contracts, e-signatures, and invoicing</div>
+        <div class="for-point"><span>✦</span>Your timeline, your tasks, your cues — all in one portal</div>
+        <div class="for-point"><span>✦</span>Reviews tied to real bookings build your reputation</div>
+        <div class="for-point"><span>✦</span><strong>Founding vendor pricing: from $50/month</strong></div>
       </div>
+      <div class="for-cta">Join as a vendor →</div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<div class="cta-section">
+<div id="sec-cta" class="cta-section">
   <h2 class="cta-title">The wedding industry<br>deserves <em>better infrastructure.</em></h2>
   <p class="cta-sub">Join the waitlist. Be first when we launch.</p>
-<div class="cta-btns">
-    <button class="cta-btn-primary" onclick="location.href='signup.html'">Join as a Couple — Free</button>
-    <button class="cta-btn-secondary" onclick="location.href='wedos-vendor-portal%20(1).html'">Join as a Vendor →</button>
+  <div class="cta-btns">
+    <button class="cta-btn-primary" onclick="window.location.href='signup.html'">Join as a Couple — Free</button>
+    <button class="cta-btn-secondary" onclick="window.location.href='signup.html'">Join as a Vendor →</button>
+  </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-logo">WedOS</div>
-  <div class="footer-copy">© 2026 WedOS · Built for the wedding industry, by the wedding industry.</div>
+  <div class="footer-links">
+    <a onclick="showAbout()">About</a>
+    <a onclick="toast('Privacy policy coming soon.')">Privacy</a>
+    <a onclick="toast('Terms of service coming soon.')">Terms</a>
+    <a onclick="window.location.href='wedos-admin-crm.html'">Admin</a>
+  </div>
+  <div class="footer-copy">© 2026 WedOS</div>
 </footer>
 
+<script>
+function heroJoin(){const e=document.getElementById('heroEmail').value;if(!e||!e.includes('@')){toast('Please enter a valid email.','error');return;}window.location.href='signup.html';}
+function showAbout(){const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';o.innerHTML=`<div style="background:#0F1117;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:40px;max-width:480px;width:100%;font-family:'DM Sans',sans-serif;color:#EDEAE4;position:relative;"><button onclick="this.closest('div[style]').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#7A7870;font-size:20px;cursor:pointer;">✕</button><div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#C9A84C;margin-bottom:16px;">About WedOS</div><p style="font-size:14px;color:#7A7870;line-height:1.7;margin-bottom:12px;">WedOS is the first operating system built specifically for the wedding industry — connecting couples and vendors inside a single, intelligent platform.</p><p style="font-size:14px;color:#7A7870;line-height:1.7;margin-bottom:24px;">We believe your wedding day deserves better infrastructure than group texts and spreadsheets.</p><div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#C9A84C;">Currently in private beta · 2026</div></div>`;o.addEventListener('click',e=>{if(e.target===o)o.remove();});document.body.appendChild(o);}
+function toast(msg,type){const t=document.createElement('div');t.style.cssText=`position:fixed;bottom:28px;right:28px;z-index:9999;background:${type==='error'?'#E05555':'#1E2D3D'};color:#fff;padding:12px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,0.3);`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
+document.getElementById('heroEmail').addEventListener('keydown',e=>{if(e.key==='Enter')heroJoin();});
+</script>
 </body>
 </html>

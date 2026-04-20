@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WedOS — Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090C;
+    --surface: #0F1117;
+    --border: rgba(255,255,255,0.07);
+    --gold: #C9A84C;
+    --gold-dim: rgba(201,168,76,0.15);
+    --rose: #C8706A;
+    --rose-dim: rgba(200,112,106,0.15);
+    --text: #EDEAE4;
+    --text-dim: #7A7870;
+    --text-dimmer: #3A3835;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+
+  nav { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 60px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); backdrop-filter: blur(20px); z-index: 10; }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--gold); cursor: pointer; }
+  .nav-link { font-size: 13px; color: var(--text-dim); text-decoration: none; }
+  .nav-link:hover { color: var(--text); }
+
+  /* Step indicator */
+  .steps { display: flex; align-items: center; gap: 8px; margin-bottom: 40px; margin-top: 80px; }
+  .step { display: flex; align-items: center; gap: 6px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dimmer); }
+  .step.active { color: var(--gold); }
+  .step.done { color: var(--text-dim); }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+  .step.done .step-num { background: var(--text-dim); color: var(--bg); border-color: var(--text-dim); }
+  .step.active .step-num { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+  .step-connector { width: 32px; height: 1px; background: var(--border); }
+
+  .screen { width: 100%; max-width: 540px; display: none; }
+  .screen.active { display: block; }
+
+  .screen-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--text); margin-bottom: 8px; text-align: center; }
+  .screen-sub { font-size: 14px; color: var(--text-dim); margin-bottom: 36px; text-align: center; font-weight: 300; line-height: 1.6; }
+
+  /* Role selection cards */
+  .role-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .role-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .role-card:hover { border-color: rgba(255,255,255,0.15); }
+  .role-card.selected-couple { border-color: var(--rose); background: var(--rose-dim); }
+  .role-card.selected-vendor { border-color: var(--gold); background: var(--gold-dim); }
+  .role-icon { font-size: 36px; margin-bottom: 14px; }
+  .role-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .role-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-bottom: 12px; }
+  .role-price { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.1em; }
+  .role-price.free { color: #4CAF7D; }
+  .role-price.paid { color: var(--gold); }
+
+  /* Form fields */
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+  .field input, .field select {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+  .field input::placeholder { color: var(--text-dimmer); }
+  .field input:focus, .field select:focus { border-color: rgba(201,168,76,0.4); }
+  .field select option { background: #1a1a1a; }
+  .two-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--gold);
+    color: #0F0C05;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-bottom: 16px;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-back {
+    width: 100%;
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  .signin-prompt { text-align: center; font-size: 13px; color: var(--text-dim); }
+  .signin-prompt a { color: var(--gold); text-decoration: none; }
+
+  /* Success screen */
+  .success-icon { font-size: 56px; text-align: center; margin-bottom: 20px; }
+  .success-list { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
+  .success-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim); padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .success-item:last-child { border-bottom: none; }
+  .success-item span { color: #4CAF7D; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">WedOS</div>
+  <a class="nav-link" href="login.html">Already have an account? Sign in →</a>
+</nav>
+
+<!-- Step Indicator -->
+<div class="steps">
+  <div class="step active" id="step1-ind"><div class="step-num">1</div> Account type</div>
+  <div class="step-connector"></div>
+  <div class="step" id="step2-ind"><div class="step-num">2</div> Your details</div>
+  <div class="step-connector"></div>
+  <div class="step" id="step3-ind"><div class="step-num">3</div> You're in</div>
+</div>
+
+<!-- STEP 1: Role selection -->
+<div class="screen active" id="screen1">
+  <div class="screen-title">Who are you?</div>
+  <div class="screen-sub">Tell us how you'll be using WedOS so we can set up the right experience for you.</div>
+
+  <div class="role-cards">
+    <div class="role-card" id="coupleCard" onclick="selectRole('couple')">
+      <div class="role-icon">💍</div>
+      <div class="role-title">Couple</div>
+      <div class="role-desc">Planning your wedding and want to manage vendors, budget, guests, and timeline all in one place.</div>
+      <div class="role-price free">Always free</div>
+    </div>
+    <div class="role-card" id="vendorCard" onclick="selectRole('vendor')">
+      <div class="role-icon">✦</div>
+      <div class="role-title">Vendor</div>
+      <div class="role-desc">A wedding professional looking to manage bookings, leads, contracts, and client communication.</div>
+      <div class="role-price paid">From $50/month</div>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="step1Btn" onclick="goToStep(2)" disabled>Continue →</button>
+  <div class="signin-prompt">Already have an account? <a href="login.html">Sign in</a></div>
+</div>
+
+<!-- STEP 2: Details form -->
+<div class="screen" id="screen2">
+  <div class="screen-title" id="step2Title">Create your account</div>
+  <div class="screen-sub" id="step2Sub">Fill in your details to get started.</div>
+
+  <!-- Couple fields -->
+  <div id="coupleFields">
+    <div class="two-fields">
+      <div class="field"><label>Partner 1 Name</label><input type="text" placeholder="Emma"></div>
+      <div class="field"><label>Partner 2 Name</label><input type="text" placeholder="James"></div>
+    </div>
+    <div class="field"><label>Wedding Date</label><input type="date"></div>
+    <div class="field"><label>Estimated Guest Count</label><input type="number" placeholder="150"></div>
+  </div>
+
+  <!-- Vendor fields -->
+  <div id="vendorFields" style="display:none">
+    <div class="field"><label>Business Name</label><input type="text" placeholder="Sofia Chen Studio"></div>
+    <div class="field"><label>Vendor Type</label>
+      <select>
+        <option value="">Select your category...</option>
+        <option>Photography</option>
+        <option>Videography</option>
+        <option>Florals</option>
+        <option>Catering</option>
+        <option>Music & DJ</option>
+        <option>Bakery / Cake</option>
+        <option>Hair & Makeup</option>
+        <option>Venue</option>
+        <option>Officiant</option>
+        <option>Transportation</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Location / City</label><input type="text" placeholder="New York, NY"></div>
+  </div>
+
+  <!-- Shared fields -->
+  <div class="field"><label>Email Address</label><input type="email" placeholder="you@example.com"></div>
+  <div class="field"><label>Password</label><input type="password" placeholder="Create a password"></div>
+
+  <button class="btn-primary" onclick="goToStep(3)">Create Account →</button>
+  <button class="btn-back" onclick="goToStep(1)">← Back</button>
+</div>
+
+<!-- STEP 3: Success -->
+<div class="screen" id="screen3">
+  <div class="success-icon">🎉</div>
+  <div class="screen-title" style="margin-bottom:12px">You're all set!</div>
+  <div class="screen-sub">Your WedOS account has been created. Here's what you can do next.</div>
+
+  <div class="success-list" id="successList"></div>
+
+  <button class="btn-primary" id="dashboardBtn" onclick="goToDashboard()">Go to My Dashboard →</button>
+</div>
+
+<script>
+  let selectedRole = null;
+
+  function selectRole(role) {
+    selectedRole = role;
+    document.getElementById('coupleCard').className = 'role-card';
+    document.getElementById('vendorCard').className = 'role-card';
+    if (role === 'couple') {
+      document.getElementById('coupleCard').className = 'role-card selected-couple';
+    } else {
+      document.getElementById('vendorCard').className = 'role-card selected-vendor';
+    }
+    document.getElementById('step1Btn').disabled = false;
+  }
+
+  function goToStep(step) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen' + step).classList.add('active');
+
+    // Update step indicator
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById('step' + i + '-ind');
+      el.className = 'step';
+      if (i < step) el.className = 'step done';
+      if (i === step) el.className = 'step active';
+    }
+
+    if (step === 2) {
+      if (selectedRole === 'couple') {
+        document.getElementById('coupleFields').style.display = 'block';
+        document.getElementById('vendorFields').style.display = 'none';
+        document.getElementById('step2Title').textContent = 'Tell us about your wedding';
+        document.getElementById('step2Sub').textContent = 'A few details to personalize your planning experience.';
+      } else {
+        document.getElementById('coupleFields').style.display = 'none';
+        document.getElementById('vendorFields').style.display = 'block';
+        document.getElementById('step2Title').textContent = 'Set up your vendor profile';
+        document.getElementById('step2Sub').textContent = 'Your profile is how couples will find and book you.';
+      }
+    }
+
+    if (step === 3) {
+      const items = selectedRole === 'couple' ? [
+        '💍 Your wedding dashboard is ready',
+        '📋 Start adding your vendors',
+        '💌 Set up your guest list & RSVPs',
+        '💰 Track your budget in one place',
+        '✨ AI Planner is ready to help'
+      ] : [
+        '✦ Your vendor profile is live',
+        '📥 New leads will appear in your inbox',
+        '📄 Set up contracts & invoicing',
+        '📅 Manage your booking calendar',
+        '⭐ Start collecting verified reviews'
+      ];
+      document.getElementById('successList').innerHTML = items.map(i =>
+        `<div class="success-item"><span>✓</span>${i}</div>`
+      ).join('');
+    }
+  }
+
+  function goToDashboard() {
+    if (selectedRole === 'vendor') {
+      window.location.href = 'wedos-vendor-portal.html';
+    } else {
+      window.location.href = 'wedos-couple-dashboard.html';
+    }
+  }
+</script>
+</body>
+</html>
