@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WedOS — Join as a Vendor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F7F6F2; --surface:#FFFFFF; --border:rgba(0,0,0,0.08);
+    --gold:#C9A84C; --gold-dim:rgba(201,168,76,0.12); --gold-light:#FBF5E8;
+    --navy:#1E2D3D; --teal:#2D6B6B;
+    --text:#1A1A1A; --text-dim:#6B7280; --text-dimmer:#B0B8C1;
+    --green:#22C580; --green-dim:rgba(34,197,128,0.1);
+    --red:#E05555;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+  .top-banner { background:var(--navy); padding:14px 40px; display:flex; align-items:center; justify-content:space-between; }
+  .banner-logo { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#fff; cursor:pointer; }
+  .banner-right { display:flex; align-items:center; gap:20px; }
+  .banner-login { font-size:13px; color:rgba(255,255,255,0.55); cursor:pointer; }
+  .banner-login span { color:#fff; text-decoration:underline; }
+  .banner-couple { font-size:12px; color:rgba(255,255,255,0.4); cursor:pointer; }
+  .banner-couple:hover { color:rgba(255,255,255,0.7); }
+
+  .progress-wrap { background:#fff; border-bottom:1px solid var(--border); padding:0 40px; }
+  .progress-inner { max-width:680px; margin:0 auto; padding:20px 0; }
+  .steps { display:flex; align-items:center; }
+  .step { display:flex; align-items:center; flex:1; }
+  .step-circle { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:10px; font-weight:700; flex-shrink:0; transition:all 0.3s; }
+  .step-circle.done { background:var(--green); color:#fff; }
+  .step-circle.active { background:var(--gold); color:#0A0800; box-shadow:0 0 0 4px rgba(201,168,76,0.2); }
+  .step-circle.inactive { background:#F0EDE8; color:var(--text-dimmer); border:1.5px solid var(--border); }
+  .step-label { font-size:11px; margin-left:8px; font-weight:500; }
+  .step-label.active { color:var(--gold); }
+  .step-label.done { color:var(--green); }
+  .step-label.inactive { color:var(--text-dimmer); }
+  .step-line { flex:1; height:1.5px; background:var(--border); margin:0 10px; }
+  .step-line.done { background:var(--green); }
+
+  .page { max-width:680px; margin:0 auto; padding:40px 20px 80px; }
+  .screen { display:none; animation:fadeIn 0.25s ease; }
+  .screen.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .screen-icon { font-size:40px; margin-bottom:16px; }
+  .screen-title { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:400; color:var(--navy); margin-bottom:8px; line-height:1.1; }
+  .screen-title em { font-style:italic; color:var(--gold); }
+  .screen-sub { font-size:14px; color:var(--text-dim); margin-bottom:36px; line-height:1.65; font-weight:300; max-width:520px; }
+
+  /* Category picker */
+  .category-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
+  .cat-card { border:1.5px solid var(--border); border-radius:10px; padding:14px 10px; text-align:center; cursor:pointer; transition:all 0.15s; background:#fff; }
+  .cat-card:hover { border-color:rgba(201,168,76,0.5); }
+  .cat-card.selected { border-color:var(--gold); background:var(--gold-light); }
+  .cat-icon { font-size:22px; margin-bottom:6px; }
+  .cat-label { font-size:10px; color:var(--text-dim); font-weight:500; line-height:1.3; }
+
+  /* Plan cards */
+  .plan-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:24px; }
+  .plan-card { border:1.5px solid var(--border); border-radius:12px; padding:20px 16px; cursor:pointer; transition:all 0.15s; background:#fff; position:relative; }
+  .plan-card:hover { border-color:rgba(201,168,76,0.5); }
+  .plan-card.selected { border-color:var(--gold); background:var(--gold-light); }
+  .plan-card.popular::before { content:'Most Popular'; position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--gold); color:#0A0800; font-family:'Space Mono',monospace; font-size:8px; padding:3px 10px; border-radius:10px; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; }
+  .plan-name { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--navy); margin-bottom:6px; }
+  .plan-price { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; color:var(--gold); margin-bottom:12px; }
+  .plan-price span { font-size:11px; color:var(--text-dimmer); font-weight:400; }
+  .plan-features { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .plan-features li { font-size:11px; color:var(--text-dim); display:flex; align-items:center; gap:6px; }
+  .plan-features li::before { content:'✓'; color:var(--green); font-weight:700; font-size:10px; flex-shrink:0; }
+
+  .field { margin-bottom:18px; }
+  .field label { display:block; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px; }
+  .field input, .field select, .field textarea {
+    width:100%; background:#fff; border:1.5px solid var(--border); border-radius:8px;
+    padding:13px 16px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text);
+    outline:none; transition:border-color 0.2s; appearance:none;
+  }
+  .field input::placeholder, .field textarea::placeholder { color:var(--text-dimmer); }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--gold); }
+  .field input.error { border-color:var(--red); }
+  .field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:36px; }
+  .field textarea { resize:vertical; min-height:90px; line-height:1.6; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .field-hint { font-size:11px; color:var(--text-dimmer); margin-top:6px; }
+
+  /* Availability days */
+  .day-pills { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .day-pill { border:1.5px solid var(--border); border-radius:20px; padding:6px 14px; font-size:12px; cursor:pointer; background:#fff; color:var(--text-dim); transition:all 0.15s; }
+  .day-pill.selected { background:var(--gold); border-color:var(--gold); color:#0A0800; font-weight:500; }
+
+  /* Password */
+  .pw-strength { margin-top:8px; }
+  .pw-bar { height:3px; border-radius:2px; background:#EEE; overflow:hidden; margin-bottom:4px; }
+  .pw-fill { height:100%; width:0%; border-radius:2px; transition:all 0.3s; }
+  .pw-label { font-size:10px; color:var(--text-dimmer); }
+
+  .check-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:14px; cursor:pointer; }
+  .check-box { width:18px; height:18px; border:1.5px solid var(--border); border-radius:4px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:10px; transition:all 0.15s; }
+  .check-box.checked { background:var(--gold); border-color:var(--gold); color:#0A0800; }
+  .check-label { font-size:12px; color:var(--text-dim); line-height:1.5; }
+  .check-label a { color:var(--gold); text-decoration:none; }
+
+  .btn-next { background:var(--gold); color:#0A0800; border:none; border-radius:8px; padding:14px 32px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:opacity 0.2s; }
+  .btn-next:hover { opacity:0.9; }
+  .btn-back { background:transparent; color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; padding:14px 24px; font-family:'DM Sans',sans-serif; font-size:14px; cursor:pointer; }
+  .btn-back:hover { border-color:rgba(0,0,0,0.2); color:var(--text); }
+  .btn-row { display:flex; justify-content:space-between; align-items:center; margin-top:32px; }
+  .btn-row.first { justify-content:flex-end; }
+
+  /* Trial badge */
+  .trial-badge { display:inline-flex; align-items:center; gap:6px; background:var(--gold-dim); border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:4px 12px; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-bottom:20px; }
+
+  /* Success */
+  .success-wrap { text-align:center; padding:20px 0; }
+  .success-icon-big { font-size:64px; margin-bottom:20px; animation:bounce 0.5s ease; }
+  @keyframes bounce { 0%{transform:scale(0.5)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+  .success-steps { display:flex; flex-direction:column; gap:12px; margin:28px 0; text-align:left; }
+  .success-step { background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:16px 18px; display:flex; align-items:center; gap:14px; }
+  .success-step-num { width:28px; height:28px; border-radius:50%; background:var(--gold-dim); border:1px solid rgba(201,168,76,0.3); display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:10px; font-weight:700; color:var(--gold); flex-shrink:0; }
+  .success-step-text { font-size:13px; color:var(--text); }
+  .success-step-text strong { color:var(--navy); }
+  .btn-dashboard { background:var(--gold); color:#0A0800; border:none; border-radius:8px; padding:15px 40px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="top-banner">
+  <div class="banner-logo" onclick="window.location.href='index.html'">WedOS</div>
+  <div class="banner-right">
+    <div class="banner-couple" onclick="window.location.href='signup-couple.html'">💍 Signing up as a couple instead?</div>
+    <div class="banner-login">Already have an account? <span onclick="window.location.href='login.html'">Sign in</span></div>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="steps">
+      <div class="step"><div class="step-circle active" id="sc1">1</div><div class="step-label active" id="sl1">Your business</div></div>
+      <div class="step-line" id="line1"></div>
+      <div class="step"><div class="step-circle inactive" id="sc2">2</div><div class="step-label inactive" id="sl2">Your services</div></div>
+      <div class="step-line" id="line2"></div>
+      <div class="step"><div class="step-circle inactive" id="sc3">3</div><div class="step-label inactive" id="sl3">Choose a plan</div></div>
+      <div class="step-line" id="line3"></div>
+      <div class="step"><div class="step-circle inactive" id="sc4">4</div><div class="step-label inactive" id="sl4">Your account</div></div>
+      <div class="step-line" id="line4"></div>
+      <div class="step"><div class="step-circle inactive" id="sc5">5</div><div class="step-label inactive" id="sl5">You're live!</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- STEP 1: Business info -->
+  <div class="screen active" id="screen1">
+    <div class="screen-icon">✦</div>
+    <div class="trial-badge">✓ 14-day free trial · No credit card required</div>
+    <div class="screen-title">Tell us about<br><em>your business</em></div>
+    <div class="screen-sub">This becomes your public vendor profile on WedOS. Couples will see this when searching for vendors like you.</div>
+
+    <div class="field">
+      <label>Business Name</label>
+      <input type="text" id="bizName" placeholder="Sofia Chen Studio">
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Your First Name</label>
+        <input type="text" id="firstName" placeholder="Sofia">
+      </div>
+      <div class="field">
+        <label>Your Last Name</label>
+        <input type="text" id="lastName" placeholder="Chen">
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Business Phone</label>
+        <input type="tel" placeholder="+1 (555) 000-0000">
+      </div>
+      <div class="field">
+        <label>Business Website <span style="color:var(--text-dimmer);font-style:italic">(optional)</span></label>
+        <input type="url" placeholder="https://yoursite.com">
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Primary City / Region</label>
+        <input type="text" id="bizCity" placeholder="New York, NY">
+      </div>
+      <div class="field">
+        <label>Service Radius</label>
+        <select>
+          <option value="">How far do you travel?</option>
+          <option>Local only (under 25 miles)</option>
+          <option>Regional (25–100 miles)</option>
+          <option>Multi-state</option>
+          <option>Nationwide</option>
+          <option>International / Destination</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Years in Business</label>
+      <select id="yearsInBiz">
+        <option value="">Select...</option>
+        <option>Just starting out (under 1 year)</option>
+        <option>1–3 years</option>
+        <option>3–5 years</option>
+        <option>5–10 years</option>
+        <option>10+ years</option>
+      </select>
+    </div>
+
+    <div class="btn-row first">
+      <button class="btn-next" onclick="goTo(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Services -->
+  <div class="screen" id="screen2">
+    <div class="screen-icon">🎯</div>
+    <div class="screen-title">What do you<br><em>specialize in?</em></div>
+    <div class="screen-sub">Select your primary category and describe your services. Be specific — this is how couples find you.</div>
+
+    <div class="field">
+      <label>Primary Vendor Category</label>
+      <div class="category-grid">
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">📸</div><div class="cat-label">Photography</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">🎥</div><div class="cat-label">Videography</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">🌸</div><div class="cat-label">Florals</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">🍽️</div><div class="cat-label">Catering</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">🎵</div><div class="cat-label">DJ / Music</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">🎂</div><div class="cat-label">Bakery / Cake</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">💄</div><div class="cat-label">Hair & Makeup</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">🏛️</div><div class="cat-label">Venue</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">📋</div><div class="cat-label">Planner / Coordinator</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">🚗</div><div class="cat-label">Transportation</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">💍</div><div class="cat-label">Officiant</div></div>
+        <div class="cat-card" onclick="selectCat(this)"><div class="cat-icon">✨</div><div class="cat-label">Other</div></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Describe Your Services</label>
+      <textarea id="bizDesc" placeholder="Tell couples what makes your work special. What's your style, your process, what's included in your packages..."></textarea>
+      <div class="field-hint">This appears on your public profile. Aim for 2–4 sentences.</div>
+    </div>
+
+    <div class="three-col">
+      <div class="field">
+        <label>Starting Price</label>
+        <input type="text" placeholder="$2,500" id="startPrice">
+      </div>
+      <div class="field">
+        <label>Average Package</label>
+        <input type="text" placeholder="$4,000">
+      </div>
+      <div class="field">
+        <label>Max Capacity / Year</label>
+        <input type="number" placeholder="30 weddings">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Typical Availability</label>
+      <div class="day-pills" id="dayPills">
+        <div class="day-pill" onclick="toggleDay(this)">Mon</div>
+        <div class="day-pill" onclick="toggleDay(this)">Tue</div>
+        <div class="day-pill" onclick="toggleDay(this)">Wed</div>
+        <div class="day-pill" onclick="toggleDay(this)">Thu</div>
+        <div class="day-pill selected" onclick="toggleDay(this)">Fri</div>
+        <div class="day-pill selected" onclick="toggleDay(this)">Sat</div>
+        <div class="day-pill selected" onclick="toggleDay(this)">Sun</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(1)">← Back</button>
+      <button class="btn-next" onclick="goTo(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Plan selection -->
+  <div class="screen" id="screen3">
+    <div class="screen-icon">💳</div>
+    <div class="screen-title">Choose your<br><em>plan</em></div>
+    <div class="screen-sub">All plans start with a 14-day free trial — no credit card needed to get started. You can upgrade or cancel anytime.</div>
+
+    <div class="plan-grid">
+      <div class="plan-card" onclick="selectPlan(this,'Starter')">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">$50<span>/mo</span></div>
+        <ul class="plan-features">
+          <li>Up to 10 active bookings</li>
+          <li>Lead inbox</li>
+          <li>Basic messaging</li>
+          <li>1 contract template</li>
+          <li>Vendor profile listing</li>
+        </ul>
+      </div>
+      <div class="plan-card popular" onclick="selectPlan(this,'Pro')" id="proPlan">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$100<span>/mo</span></div>
+        <ul class="plan-features">
+          <li>Unlimited bookings</li>
+          <li>Priority lead placement</li>
+          <li>Full messaging suite</li>
+          <li>Unlimited contracts</li>
+          <li>Payment & invoicing</li>
+          <li>Analytics dashboard</li>
+        </ul>
+      </div>
+      <div class="plan-card" onclick="selectPlan(this,'Studio')">
+        <div class="plan-name">Studio</div>
+        <div class="plan-price">$150<span>/mo</span></div>
+        <ul class="plan-features">
+          <li>Everything in Pro</li>
+          <li>Team member access (3)</li>
+          <li>White-label client portal</li>
+          <li>Dedicated account manager</li>
+          <li>API access</li>
+          <li>Priority support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:14px 18px;font-size:13px;color:var(--text-dim);margin-bottom:20px;">
+      ✓ All plans include a <strong style="color:var(--navy)">14-day free trial</strong>. You won't be charged until your trial ends, and you can cancel anytime.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(2)">← Back</button>
+      <button class="btn-next" onclick="goTo(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Account -->
+  <div class="screen" id="screen4">
+    <div class="screen-icon">🔐</div>
+    <div class="screen-title">Create your<br><em>login</em></div>
+    <div class="screen-sub">These are the credentials you'll use to sign into WedOS every time.</div>
+
+    <div class="field">
+      <label>Business Email</label>
+      <input type="email" id="email" placeholder="sofia@chenstudio.com">
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="sofiachenphoto" oninput="checkUsername(this.value)">
+        <div class="field-hint" id="usernameHint">No spaces. Min 3 characters.</div>
+      </div>
+      <div class="field">
+        <label>Business Phone</label>
+        <input type="tel" placeholder="+1 (555) 000-0000">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="pw1" placeholder="Create a strong password" oninput="checkPW(this.value)">
+      <div class="pw-strength">
+        <div class="pw-bar"><div class="pw-fill" id="pwBar"></div></div>
+        <div class="pw-label" id="pwLabel">Enter a password</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Confirm Password</label>
+      <input type="password" id="pw2" placeholder="Re-enter your password">
+    </div>
+
+    <div class="check-row" onclick="toggleCheck(this)" id="termsCheck">
+      <div class="check-box"></div>
+      <span class="check-label">I agree to the <a href="#">Terms of Service</a>, <a href="#">Privacy Policy</a>, and <a href="#">Vendor Agreement</a>. I understand my trial begins today.</span>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(3)">← Back</button>
+      <button class="btn-next" onclick="createAccount()">Create Account →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Success -->
+  <div class="screen" id="screen5">
+    <div class="success-wrap">
+      <div class="success-icon-big">✦</div>
+      <div class="screen-title"><em id="successBiz">Your business</em><br>is now on WedOS</div>
+      <div class="screen-sub">Your 14-day free trial starts now. Here's what to do next to start getting bookings.</div>
+      <div class="success-steps">
+        <div class="success-step"><div class="success-step-num">1</div><div class="success-step-text"><strong>Complete your profile</strong> — Add photos, portfolio samples, and your full bio to stand out.</div></div>
+        <div class="success-step"><div class="success-step-num">2</div><div class="success-step-text"><strong>Set your availability</strong> — Tell couples which dates you're open so leads match correctly.</div></div>
+        <div class="success-step"><div class="success-step-num">3</div><div class="success-step-text"><strong>Upload a contract template</strong> — You'll use this to send contracts directly from WedOS.</div></div>
+        <div class="success-step"><div class="success-step-num">4</div><div class="success-step-text"><strong>Wait for leads</strong> — Couples matching your category and location will start appearing in your inbox.</div></div>
+      </div>
+      <button class="btn-dashboard" onclick="window.location.href='wedos-vendor-portal.html'">Go to My Vendor Portal →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentStep = 1;
+  let selectedPlan = 'Pro';
+
+  // Pre-select Pro plan
+  document.getElementById('proPlan').classList.add('selected');
+
+  function goTo(step) {
+    document.getElementById('screen' + currentStep).classList.remove('active');
+    currentStep = step;
+    document.getElementById('screen' + step).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+    updateProgress();
+  }
+
+  function updateProgress() {
+    for (let i = 1; i <= 5; i++) {
+      const circle = document.getElementById('sc' + i);
+      const label = document.getElementById('sl' + i);
+      const line = document.getElementById('line' + i);
+      if (i < currentStep) {
+        circle.className = 'step-circle done'; circle.textContent = '✓';
+        label.className = 'step-label done';
+        if (line) line.className = 'step-line done';
+      } else if (i === currentStep) {
+        circle.className = 'step-circle active'; circle.textContent = i;
+        label.className = 'step-label active';
+      } else {
+        circle.className = 'step-circle inactive'; circle.textContent = i;
+        label.className = 'step-label inactive';
+      }
+    }
+  }
+
+  function selectCat(card) {
+    document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  }
+
+  function selectPlan(card, plan) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedPlan = plan;
+  }
+
+  function toggleDay(pill) {
+    pill.classList.toggle('selected');
+  }
+
+  function toggleCheck(row) {
+    row.querySelector('.check-box').classList.toggle('checked');
+  }
+
+  function checkUsername(val) {
+    const hint = document.getElementById('usernameHint');
+    if (!val) { hint.style.color='var(--text-dimmer)'; hint.textContent='No spaces. Min 3 characters.'; return; }
+    if (/\s/.test(val)) { hint.style.color='var(--red)'; hint.textContent='✕ No spaces allowed'; return; }
+    if (val.length < 3) { hint.style.color='var(--red)'; hint.textContent='✕ Too short'; return; }
+    hint.style.color='var(--green)'; hint.textContent='✓ Username available';
+  }
+
+  function checkPW(val) {
+    const bar = document.getElementById('pwBar');
+    const label = document.getElementById('pwLabel');
+    let s = 0;
+    if (val.length >= 8) s++;
+    if (/[A-Z]/.test(val)) s++;
+    if (/[0-9]/.test(val)) s++;
+    if (/[^A-Za-z0-9]/.test(val)) s++;
+    const l = [{w:'0%',c:'transparent',t:'Enter a password'},{w:'25%',c:'#E05555',t:'Weak'},{w:'50%',c:'#E05555',t:'Fair'},{w:'75%',c:'#E09B3D',t:'Good'},{w:'100%',c:'var(--green)',t:'Strong ✓'}];
+    bar.style.width=l[s].w; bar.style.background=l[s].c;
+    label.style.color=l[s].c; label.textContent=l[s].t;
+  }
+
+  function createAccount() {
+    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const pw1 = document.getElementById('pw1').value;
+    const pw2 = document.getElementById('pw2').value;
+    const terms = document.querySelector('#termsCheck .check-box').classList.contains('checked');
+
+    if (!email || !email.includes('@')) { document.getElementById('email').classList.add('error'); return; }
+    if (!username || username.length < 3) { document.getElementById('username').classList.add('error'); return; }
+    if (!pw1 || pw1.length < 8) { document.getElementById('pw1').classList.add('error'); return; }
+    if (pw1 !== pw2) { document.getElementById('pw2').classList.add('error'); return; }
+    if (!terms) { alert('Please agree to the Terms of Service to continue.'); return; }
+
+    const biz = document.getElementById('bizName').value || 'Your business';
+    document.getElementById('successBiz').textContent = biz;
+
+    // ── In production: call Supabase auth.signUp() here ──
+    goTo(5);
+  }
+</script>
+</body>
+</html>

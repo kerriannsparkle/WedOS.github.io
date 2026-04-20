@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WedOS — Join as a Couple</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FAF8F5; --surface:#FFFFFF; --border:rgba(0,0,0,0.08);
+    --rose:#C8706A; --rose-dim:rgba(200,112,106,0.1); --rose-light:#FDE8E7;
+    --navy:#2C3E5D; --gold:#B8933A;
+    --text:#1A1A1A; --text-dim:#7A7570; --text-dimmer:#B0AAA5;
+    --green:#4CAF7D; --green-dim:rgba(76,175,125,0.1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+  /* Top banner */
+  .top-banner { background:var(--navy); padding:14px 40px; display:flex; align-items:center; justify-content:space-between; }
+  .banner-logo { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#fff; cursor:pointer; }
+  .banner-login { font-size:13px; color:rgba(255,255,255,0.55); cursor:pointer; }
+  .banner-login span { color:#fff; text-decoration:underline; cursor:pointer; }
+  .banner-login span:hover { color:rgba(255,255,255,0.8); }
+
+  /* Progress bar */
+  .progress-wrap { background:#fff; border-bottom:1px solid var(--border); padding:0 40px; }
+  .progress-inner { max-width:640px; margin:0 auto; padding:20px 0; }
+  .steps { display:flex; align-items:center; gap:0; }
+  .step { display:flex; align-items:center; flex:1; }
+  .step-circle { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:10px; font-weight:700; flex-shrink:0; transition:all 0.3s; }
+  .step-circle.done { background:var(--green); color:#fff; }
+  .step-circle.active { background:var(--rose); color:#fff; box-shadow:0 0 0 4px rgba(200,112,106,0.2); }
+  .step-circle.inactive { background:#F0EDEA; color:var(--text-dimmer); border:1.5px solid var(--border); }
+  .step-label { font-size:11px; margin-left:8px; font-weight:500; }
+  .step-label.active { color:var(--rose); }
+  .step-label.done { color:var(--green); }
+  .step-label.inactive { color:var(--text-dimmer); }
+  .step-line { flex:1; height:1.5px; background:var(--border); margin:0 10px; }
+  .step-line.done { background:var(--green); }
+
+  /* Main layout */
+  .page { max-width:640px; margin:0 auto; padding:40px 20px 80px; }
+
+  .screen { display:none; animation:fadeIn 0.25s ease; }
+  .screen.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .screen-icon { font-size:40px; margin-bottom:16px; }
+  .screen-title { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:400; color:var(--navy); margin-bottom:8px; line-height:1.1; }
+  .screen-title em { font-style:italic; color:var(--rose); }
+  .screen-sub { font-size:14px; color:var(--text-dim); margin-bottom:36px; line-height:1.65; font-weight:300; max-width:480px; }
+
+  /* Cards */
+  .budget-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+  .budget-card { border:1.5px solid var(--border); border-radius:10px; padding:14px 12px; text-align:center; cursor:pointer; transition:all 0.15s; background:#fff; }
+  .budget-card:hover { border-color:rgba(200,112,106,0.4); }
+  .budget-card.selected { border-color:var(--rose); background:var(--rose-light); }
+  .budget-card-val { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+  .budget-card-label { font-size:10px; color:var(--text-dim); }
+
+  .vibe-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+  .vibe-card { border:1.5px solid var(--border); border-radius:10px; padding:16px 12px; text-align:center; cursor:pointer; transition:all 0.15s; background:#fff; }
+  .vibe-card:hover { border-color:rgba(200,112,106,0.3); }
+  .vibe-card.selected { border-color:var(--rose); background:var(--rose-light); }
+  .vibe-icon { font-size:24px; margin-bottom:8px; }
+  .vibe-label { font-size:12px; color:var(--text-dim); font-weight:500; }
+
+  /* Fields */
+  .field { margin-bottom:18px; }
+  .field label { display:block; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px; }
+  .field input, .field select {
+    width:100%; background:#fff; border:1.5px solid var(--border); border-radius:8px;
+    padding:13px 16px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text);
+    outline:none; transition:border-color 0.2s; appearance:none;
+  }
+  .field input::placeholder { color:var(--text-dimmer); }
+  .field input:focus, .field select:focus { border-color:var(--rose); }
+  .field input.error { border-color:var(--rose); background:var(--rose-light); }
+  .field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237A7570' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:36px; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  .field-hint { font-size:11px; color:var(--text-dimmer); margin-top:6px; }
+  .char-count { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dimmer); float:right; }
+
+  /* Password strength */
+  .pw-strength { margin-top:8px; }
+  .pw-bar { height:3px; border-radius:2px; background:#EEE; overflow:hidden; margin-bottom:4px; }
+  .pw-fill { height:100%; width:0%; border-radius:2px; transition:all 0.3s; }
+  .pw-label { font-size:10px; color:var(--text-dimmer); }
+
+  /* Checkbox */
+  .check-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:14px; cursor:pointer; }
+  .check-box { width:18px; height:18px; border:1.5px solid var(--border); border-radius:4px; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:10px; transition:all 0.15s; }
+  .check-box.checked { background:var(--rose); border-color:var(--rose); color:#fff; }
+  .check-label { font-size:12px; color:var(--text-dim); line-height:1.5; }
+  .check-label a { color:var(--rose); text-decoration:none; }
+
+  /* Buttons */
+  .btn-next { background:var(--rose); color:#fff; border:none; border-radius:8px; padding:14px 32px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:opacity 0.2s; }
+  .btn-next:hover { opacity:0.9; }
+  .btn-back { background:transparent; color:var(--text-dim); border:1.5px solid var(--border); border-radius:8px; padding:14px 24px; font-family:'DM Sans',sans-serif; font-size:14px; cursor:pointer; transition:all 0.15s; }
+  .btn-back:hover { border-color:rgba(0,0,0,0.2); color:var(--text); }
+  .btn-row { display:flex; justify-content:space-between; align-items:center; margin-top:32px; }
+  .btn-row.first { justify-content:flex-end; }
+
+  /* Freebadge */
+  .free-badge { display:inline-flex; align-items:center; gap:6px; background:var(--green-dim); border:1px solid rgba(76,175,125,0.3); border-radius:20px; padding:4px 12px; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--green); margin-bottom:20px; }
+
+  /* Success */
+  .success-wrap { text-align:center; padding:20px 0; }
+  .success-icon-big { font-size:64px; margin-bottom:20px; animation:bounce 0.5s ease; }
+  @keyframes bounce { 0%{transform:scale(0.5)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+  .success-cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:28px 0; text-align:left; }
+  .success-card { background:#fff; border:1.5px solid var(--border); border-radius:10px; padding:16px; }
+  .success-card-icon { font-size:20px; margin-bottom:8px; }
+  .success-card-title { font-size:13px; font-weight:500; color:var(--navy); margin-bottom:4px; }
+  .success-card-text { font-size:11px; color:var(--text-dim); line-height:1.5; }
+  .btn-dashboard { background:var(--rose); color:#fff; border:none; border-radius:8px; padding:15px 40px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="top-banner">
+  <div class="banner-logo" onclick="window.location.href='index.html'">WedOS</div>
+  <div class="banner-login">Already have an account? <span onclick="window.location.href='login.html'">Sign in</span></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="steps" id="stepsBar">
+      <div class="step">
+        <div class="step-circle active" id="sc1">1</div>
+        <div class="step-label active" id="sl1">Your wedding</div>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step">
+        <div class="step-circle inactive" id="sc2">2</div>
+        <div class="step-label inactive" id="sl2">Your style</div>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step">
+        <div class="step-circle inactive" id="sc3">3</div>
+        <div class="step-label inactive" id="sl3">Your account</div>
+      </div>
+      <div class="step-line" id="line3"></div>
+      <div class="step">
+        <div class="step-circle inactive" id="sc4">4</div>
+        <div class="step-label inactive" id="sl4">All set!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- STEP 1: Wedding basics -->
+  <div class="screen active" id="screen1">
+    <div class="screen-icon">💍</div>
+    <div class="free-badge">✓ Always free for couples</div>
+    <div class="screen-title">Tell us about<br><em>your wedding</em></div>
+    <div class="screen-sub">We'll use this to personalize your planning experience and connect you with the right vendors.</div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Partner 1 — First Name</label>
+        <input type="text" id="p1name" placeholder="Emma">
+      </div>
+      <div class="field">
+        <label>Partner 2 — First Name</label>
+        <input type="text" id="p2name" placeholder="James">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Wedding Date <span style="color:var(--text-dimmer);font-style:italic">(or approximate)</span></label>
+      <input type="date" id="weddingDate">
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Wedding Location / City</label>
+        <input type="text" id="weddingCity" placeholder="New York, NY">
+      </div>
+      <div class="field">
+        <label>Venue Name <span style="color:var(--text-dimmer);font-style:italic">(if known)</span></label>
+        <input type="text" id="venueName" placeholder="Rosewood Estate">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Estimated Guest Count</label>
+      <select id="guestCount">
+        <option value="">Select a range...</option>
+        <option>Under 50 (Intimate)</option>
+        <option>50–100</option>
+        <option>100–150</option>
+        <option>150–200</option>
+        <option>200–300</option>
+        <option>300+ (Large celebration)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Total Wedding Budget</label>
+      <div class="budget-grid">
+        <div class="budget-card" onclick="selectBudget(this)"><div class="budget-card-val">Under $15k</div><div class="budget-card-label">Intimate & chic</div></div>
+        <div class="budget-card" onclick="selectBudget(this)"><div class="budget-card-val">$15k–$30k</div><div class="budget-card-label">Classic</div></div>
+        <div class="budget-card" onclick="selectBudget(this)"><div class="budget-card-val">$30k–$50k</div><div class="budget-card-label">Elevated</div></div>
+        <div class="budget-card" onclick="selectBudget(this)"><div class="budget-card-val">$50k–$75k</div><div class="budget-card-label">Luxury</div></div>
+        <div class="budget-card" onclick="selectBudget(this)"><div class="budget-card-val">$75k–$100k</div><div class="budget-card-label">Ultra-luxury</div></div>
+        <div class="budget-card" onclick="selectBudget(this)"><div class="budget-card-val">$100k+</div><div class="budget-card-label">No limits</div></div>
+      </div>
+    </div>
+
+    <div class="btn-row first">
+      <button class="btn-next" onclick="goTo(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Style & vibe -->
+  <div class="screen" id="screen2">
+    <div class="screen-icon">🌸</div>
+    <div class="screen-title">What's your<br><em>wedding vibe?</em></div>
+    <div class="screen-sub">Pick everything that feels like you. Your AI planner will use this to suggest vendors and ideas that match your vision.</div>
+
+    <div class="field">
+      <label>Wedding Style (pick all that apply)</label>
+      <div class="vibe-grid">
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🌿</div><div class="vibe-label">Garden / Outdoor</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🏛️</div><div class="vibe-label">Classic / Formal</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🤍</div><div class="vibe-label">Minimalist / Modern</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🕯️</div><div class="vibe-label">Romantic / Candlelit</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🎪</div><div class="vibe-label">Bohemian / Whimsical</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">✨</div><div class="vibe-label">Glam / Luxe</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🌾</div><div class="vibe-label">Rustic / Barn</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🏖️</div><div class="vibe-label">Beach / Destination</div></div>
+        <div class="vibe-card" onclick="toggleVibe(this)"><div class="vibe-icon">🎨</div><div class="vibe-label">Artsy / Eclectic</div></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Color Palette <span style="color:var(--text-dimmer)">(describe yours)</span></label>
+      <input type="text" id="colorPalette" placeholder="e.g. Dusty rose, sage green, warm ivory">
+    </div>
+
+    <div class="field">
+      <label>Vendors still needed <span style="color:var(--text-dimmer)">(select all)</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">📸 Photographer</span></div>
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">🎥 Videographer</span></div>
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">🌸 Florist</span></div>
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">🍽️ Caterer</span></div>
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">🎂 Bakery / Cake</span></div>
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">🎵 DJ / Band</span></div>
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">💄 Hair & Makeup</span></div>
+        <div class="check-row" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-label">🚗 Transportation</span></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(1)">← Back</button>
+      <button class="btn-next" onclick="goTo(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Account creation -->
+  <div class="screen" id="screen3">
+    <div class="screen-icon">🔐</div>
+    <div class="screen-title">Create your<br><em>account</em></div>
+    <div class="screen-sub">Your username and password are how you'll sign in every time. Keep them somewhere safe.</div>
+
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="emma@example.com">
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="emmajames2026" oninput="checkUsername(this.value)">
+        <div class="field-hint" id="usernameHint">Used to sign in. No spaces or special characters.</div>
+      </div>
+      <div class="field">
+        <label>Phone <span style="color:var(--text-dimmer);font-style:italic">(optional)</span></label>
+        <input type="tel" placeholder="+1 (555) 000-0000">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="pw1" placeholder="Create a strong password" oninput="checkPW(this.value)">
+      <div class="pw-strength">
+        <div class="pw-bar"><div class="pw-fill" id="pwBar"></div></div>
+        <div class="pw-label" id="pwLabel">Enter a password</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Confirm Password</label>
+      <input type="password" id="pw2" placeholder="Re-enter your password">
+    </div>
+
+    <div class="check-row" onclick="toggleCheck(this)" id="termsCheck">
+      <div class="check-box"></div>
+      <span class="check-label">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand WedOS is free for couples.</span>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(2)">← Back</button>
+      <button class="btn-next" onclick="createAccount()">Create Account →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Success -->
+  <div class="screen" id="screen4">
+    <div class="success-wrap">
+      <div class="success-icon-big">🎉</div>
+      <div class="screen-title">You're in,<br><em id="successName">Emma</em>!</div>
+      <div class="screen-sub">Your WedOS planning dashboard is ready. Here's what's waiting for you:</div>
+      <div class="success-cards">
+        <div class="success-card"><div class="success-card-icon">📋</div><div class="success-card-title">Wedding Checklist</div><div class="success-card-text">A complete step-by-step guide tailored to your date and style.</div></div>
+        <div class="success-card"><div class="success-card-icon">🤝</div><div class="success-card-title">Vendor Hub</div><div class="success-card-text">Add and manage all your vendors in one place, with contract tracking.</div></div>
+        <div class="success-card"><div class="success-card-icon">💰</div><div class="success-card-title">Budget Tracker</div><div class="success-card-text">Log deposits, final payments, and see where every dollar goes.</div></div>
+        <div class="success-card"><div class="success-card-icon">✨</div><div class="success-card-title">AI Planner</div><div class="success-card-text">Your AI wedding assistant is already watching for issues and opportunities.</div></div>
+      </div>
+      <button class="btn-dashboard" onclick="window.location.href='wedos-couple-dashboard.html'">Go to My Dashboard →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentStep = 1;
+  let selectedBudget = null;
+
+  function goTo(step) {
+    // Validation
+    if (step > currentStep) {
+      if (currentStep === 1) {
+        const p1 = document.getElementById('p1name').value.trim();
+        const p2 = document.getElementById('p2name').value.trim();
+        if (!p1 || !p2) {
+          highlight(['p1name','p2name'].filter(id => !document.getElementById(id).value.trim()));
+          return;
+        }
+      }
+      if (currentStep === 3 && step === 4) { createAccount(); return; }
+    }
+
+    document.getElementById('screen' + currentStep).classList.remove('active');
+    currentStep = step;
+    document.getElementById('screen' + step).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+    updateProgress();
+  }
+
+  function updateProgress() {
+    for (let i = 1; i <= 4; i++) {
+      const circle = document.getElementById('sc' + i);
+      const label = document.getElementById('sl' + i);
+      const line = document.getElementById('line' + i);
+      if (i < currentStep) {
+        circle.className = 'step-circle done'; circle.textContent = '✓';
+        label.className = 'step-label done';
+        if (line) line.className = 'step-line done';
+      } else if (i === currentStep) {
+        circle.className = 'step-circle active'; circle.textContent = i;
+        label.className = 'step-label active';
+      } else {
+        circle.className = 'step-circle inactive'; circle.textContent = i;
+        label.className = 'step-label inactive';
+      }
+    }
+  }
+
+  function highlight(ids) {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.add('error');
+      el.focus();
+      setTimeout(() => el.classList.remove('error'), 2000);
+    });
+  }
+
+  function selectBudget(card) {
+    document.querySelectorAll('.budget-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedBudget = card.querySelector('.budget-card-val').textContent;
+  }
+
+  function toggleVibe(card) {
+    card.classList.toggle('selected');
+  }
+
+  function toggleCheck(row) {
+    const box = row.querySelector('.check-box');
+    box.classList.toggle('checked');
+  }
+
+  function checkUsername(val) {
+    const hint = document.getElementById('usernameHint');
+    if (val.length === 0) { hint.style.color = 'var(--text-dimmer)'; hint.textContent = 'Used to sign in. No spaces or special characters.'; return; }
+    if (/\s/.test(val)) { hint.style.color = 'var(--rose)'; hint.textContent = '✕ No spaces allowed'; return; }
+    if (val.length < 3) { hint.style.color = 'var(--rose)'; hint.textContent = '✕ Too short (min 3 characters)'; return; }
+    hint.style.color = 'var(--green)'; hint.textContent = '✓ Username looks good';
+  }
+
+  function checkPW(val) {
+    const bar = document.getElementById('pwBar');
+    const label = document.getElementById('pwLabel');
+    let strength = 0;
+    if (val.length >= 8) strength++;
+    if (/[A-Z]/.test(val)) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    if (/[^A-Za-z0-9]/.test(val)) strength++;
+    const levels = [
+      {w:'0%', color:'transparent', text:'Enter a password'},
+      {w:'25%', color:'var(--rose)', text:'Weak'},
+      {w:'50%', color:'var(--rose)', text:'Fair'},
+      {w:'75%', color:'#E09B3D', text:'Good'},
+      {w:'100%', color:'var(--green)', text:'Strong ✓'}
+    ];
+    bar.style.width = levels[strength].w;
+    bar.style.background = levels[strength].color;
+    label.style.color = levels[strength].color;
+    label.textContent = levels[strength].text;
+  }
+
+  function createAccount() {
+    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const pw1 = document.getElementById('pw1').value;
+    const pw2 = document.getElementById('pw2').value;
+    const terms = document.querySelector('#termsCheck .check-box').classList.contains('checked');
+
+    if (!email || !email.includes('@')) { highlight(['email']); return; }
+    if (!username || username.length < 3) { highlight(['username']); return; }
+    if (!pw1 || pw1.length < 8) { highlight(['pw1']); return; }
+    if (pw1 !== pw2) { highlight(['pw2']); return; }
+    if (!terms) { alert('Please agree to the Terms of Service to continue.'); return; }
+
+    const p1 = document.getElementById('p1name').value || 'there';
+    document.getElementById('successName').textContent = p1;
+
+    // ── In production: call Supabase auth.signUp() here ──
+    goTo(4);
+  }
+</script>
+</body>
+</html>
